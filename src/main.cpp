@@ -1,73 +1,54 @@
-#include <SFML/Graphics.hpp>
-#include <sstream>
+// main.cpp
+#include "Window.h"
+#include "Scene.h"
+#include "MainScreen.h"
+#include "GameScreen.h"
+#include <iostream>
+#include "InputManager.h"
 
-int main()
-{
-    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktop, "SFML works!", sf::Style::Fullscreen);
-    window.setFramerateLimit(120);
-    sf::CircleShape shape(50.f);
-    shape.setFillColor(sf::Color::Green);
-    
-    shape.setPosition((desktop.width - shape.getRadius() * 2) / 2, (desktop.height - shape.getRadius() * 2) / 2);
+int main() {
+    Window window("Minimalist Roguelite Game", {800, 600});
+    InputManager inputManager;
 
-    float moveSpeed = 300.0f;
+    Scene* currentScene = new GameScreen();
+    currentScene->init();
+
     sf::Clock clock;
-    sf::Font font;
-    if (!font.loadFromFile("res/fonts/cocogoose.ttf")) {
-        return -1; // Handle error
-    }
-    sf::Text fpsText;
-    fpsText.setFont(font);
-    fpsText.setCharacterSize(24);
-    fpsText.setFillColor(sf::Color::White);
-    fpsText.setPosition(desktop.width - 100, 10);
 
-    while (window.isOpen())
-    {
-        sf::Time deltaTime = clock.restart();
+    while (window.isOpen()) {
+        float deltaTime = clock.restart().asSeconds();
+
+        window.update(); // Handle window events
+
+        // Handle input events
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
+        while (window.getRenderWindow()->pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
                 window.close();
+            }
+            inputManager.handleEvent(event);
         }
 
-        sf::Vector2f movement(0.f, 0.f);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            movement.x -= moveSpeed * deltaTime.asSeconds();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            movement.x += moveSpeed * deltaTime.asSeconds();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {
-            movement.y -= moveSpeed * deltaTime.asSeconds();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            movement.y += moveSpeed * deltaTime.asSeconds();
-        }
-        shape.move(movement);
+        currentScene->handleInput(inputManager);
+        currentScene->update(deltaTime);
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        {
-            window.close();
-        }
+        window.beginDraw();
+        currentScene->draw(*window.getRenderWindow());
+        window.endDraw();
 
-        // Calculate FPS
-        float fps = 1.0f / deltaTime.asSeconds();
-        std::stringstream ss;
-        ss << "FPS: " << static_cast<int>(fps);
-        fpsText.setString(ss.str());
+        inputManager.update(); // Reset per-frame input states
 
-        window.clear();
-        window.draw(shape);
-        window.draw(fpsText);
-        window.display();
+        // Scene transition logic
+        // if (someCondition) {
+        //     currentScene->cleanup();
+        //     delete currentScene;
+        //     currentScene = new GameScreen();
+        //     currentScene->init();
+        // }
     }
+
+    currentScene->cleanup();
+    delete currentScene;
 
     return 0;
 }
