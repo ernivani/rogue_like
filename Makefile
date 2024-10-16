@@ -1,5 +1,5 @@
 SRC = src
-INCLUDES = -Iinclude
+INCLUDES = -Iincludes
 DLLS = 
 OUT_DIR = out
 
@@ -25,25 +25,22 @@ else
     XCOPY = cp -r
 endif
 
-
 SRCS = $(wildcard $(SRC)/*.cpp)
-
 
 all: $(OUT) run
 
 $(OUT): $(SRCS)
 	$(CC) $(SRCS) $(INCLUDES) $(LIBS) -o $(OUT)
 
-copy-dlls:
-	$(foreach DLL, $(DLLS), $(COPY) $(DLL) $(OUT_DIR) &)
-	$(XCOPY) res $(OUT_DIR)\res /E /I /Y
+copy-res:
+	$(XCOPY) res $(OUT_DIR)/res
 
 run:
 	$(OUT_DIR)/main
 
 clean:
-	-$(RM) $(OUT_DIR)\*.exe
-	-$(RM) $(OUT_DIR)\*.dll
-	-$(RM) $(OUT_DIR)\*.js $(OUT_DIR)\*.wasm $(OUT_DIR)\*.data $(OUT_DIR)\*.html
-	-$(RMDIR) $(OUT_DIR)\res
+	-$(RM) $(OUT_DIR)/*.exe
+	-$(RM) $(OUT_DIR)/*.dll
+	-$(RM) $(OUT_DIR)/*.js $(OUT_DIR)/*.wasm $(OUT_DIR)/*.data $(OUT_DIR)/*.html
+	-$(RMDIR) $(OUT_DIR)/res
 	@echo Cleaned
