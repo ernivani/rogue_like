@@ -3,44 +3,69 @@ INCLUDES = -Iincludes
 DLLS = 
 OUT_DIR = out
 
-# Output files
 OUT = $(OUT_DIR)/main
 
-# Libraries
-LIBS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
+LIB = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
 
-# Compilers
 CC = g++
 
-# Determine the OS
+EMCC = emcc
+
+# EM_FLAGS = -O2 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS="['png']" -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 --preload-file res
+
+
 ifeq ($(OS),Windows_NT)
     RM = del /Q
     RMDIR = rmdir /S /Q
     COPY = copy
     XCOPY = xcopy
+    SEP = \\
+    EXE = .exe
+    DLLS = 
+    OUT = $(OUT)$(EXE)
+    RUN_CMD = $(OUT)
+    LIB_DIRS = -Llib
+    LIBS = $(LIB_DIRS) $(LIB)
+    COPY_DLLS = $(foreach DLL, $(DLLS), $(COPY) $(DLL) $(OUT_DIR) &)
+    COPY_RES = $(XCOPY) res\* $(OUT_DIR)$(SEP)res /E /I /Y
 else
     RM = rm -f
     RMDIR = rm -rf
     COPY = cp
     XCOPY = cp -r
+    SEP = /
+    EXE =
+    DLLS =
+    OUT = $(OUT_DIR)$(SEP)main$(EXE)
+    RUN_CMD = ./$(OUT)
+    LIB_DIRS =
+    LIBS = $(LIB_DIRS) $(LIB)
+    COPY_DLLS =
+    COPY_RES = $(XCOPY) res/. $(OUT_DIR)$(SEP)res
 endif
 
 SRCS = $(wildcard $(SRC)/*.cpp)
 
-all: $(OUT) run
+all: $(OUT) run copy-resources
 
 $(OUT): $(SRCS)
 	$(CC) $(SRCS) $(INCLUDES) $(LIBS) -o $(OUT)
 
-copy-res:
-	$(XCOPY) res $(OUT_DIR)/res
+emsdk: $(OUT_JS)
+
+$(OUT_JS): $(SRCS)
+	$(EMCC) $(SRCS) $(INCLUDES) $(EM_FLAGS) -o $(OUT_JS)
+
+copy-resources:
+	$(COPY_DLLS)
+	$(COPY_RES)
 
 run:
-	$(OUT_DIR)/main
+	$(RUN_CMD)
 
 clean:
-	-$(RM) $(OUT_DIR)/*.exe
-	-$(RM) $(OUT_DIR)/*.dll
-	-$(RM) $(OUT_DIR)/*.js $(OUT_DIR)/*.wasm $(OUT_DIR)/*.data $(OUT_DIR)/*.html
-	-$(RMDIR) $(OUT_DIR)/res
+	-$(RM) $(OUT_DIR)$(SEP)*$(EXE)
+	-$(RM) $(OUT_DIR)$(SEP)*.dll
+	-$(RM) $(OUT_DIR)$(SEP)*.js $(OUT_DIR)$(SEP)*.wasm $(OUT_DIR)$(SEP)*.data $(OUT_DIR)$(SEP)*.html
+	-$(RMDIR) $(OUT_DIR)$(SEP)res
 	@echo Cleaned
