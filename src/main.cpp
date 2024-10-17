@@ -7,12 +7,12 @@
 #include "InputManager.h"
 
 int main() {
-    Window window("Minimalist Roguelite Game", {800, 600});
+    Window window("Minimalist Roguelite Game", {800, 600}, 120,true);
     InputManager inputManager;
 
     SceneManager& sceneManager = SceneManager::getInstance();
     sceneManager.addScene(new MainScreen("MainScreen"));
-    sceneManager.addScene(new GameScreen("GameScreen"));
+    sceneManager.addScene(new GameScreen("GameScreen", window.getWindowSize().x, window.getWindowSize().y));
     sceneManager.changeScene("MainScreen");
 
     // Initial check for the current scene

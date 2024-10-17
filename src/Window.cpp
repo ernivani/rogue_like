@@ -1,8 +1,10 @@
 // Window.cpp
 #include "Window.h"
 
-Window::Window(const std::string& title, const sf::Vector2u& size) {
+Window::Window(const std::string& title, const sf::Vector2u& size, int frameRateLimit, bool isFullscreen) {
     setup(title, size);
+    m_window.setFramerateLimit(frameRateLimit);
+    m_isFullscreen = isFullscreen;
 }
 
 Window::~Window() {
@@ -12,7 +14,6 @@ Window::~Window() {
 void Window::setup(const std::string& title, const sf::Vector2u& size) {
     m_windowTitle = title;
     m_windowSize = size;
-    m_isFullscreen = false;
     m_isDone = false;
     create();
 }

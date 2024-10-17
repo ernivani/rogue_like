@@ -7,7 +7,7 @@
 
 class Window {
 public:
-    Window(const std::string& title, const sf::Vector2u& size);
+    Window(const std::string& title, const sf::Vector2u& size, int frameRateLimit = 60, bool isFullscreen = false);
     ~Window();
 
     void beginDraw(); // Clear the window
