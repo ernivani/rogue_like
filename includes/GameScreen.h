@@ -1,33 +1,33 @@
-// GameScreen.h
 #ifndef GAMESCREEN_H
 #define GAMESCREEN_H
 
 #include "Scene.h"
 #include "Snake.h"
 #include "Food.h"
-#include "KeyboardManager.h"
+#include "SnakeAI.h"
 #include "SceneManager.h"
-#include <vector>
+#include <deque>
 
 class GameScreen : public Scene {
 public:
     GameScreen(const std::string& name, float windowWidth, float windowHeight);
-    void init() override;
-    void handleInput(InputManager& inputManager) override;
-    void update(float deltaTime) override;
-    void draw(sf::RenderWindow& window) override;
-    void cleanup() override;
+    virtual void init() override;
+    virtual void handleInput(InputManager& inputManager) override;
+    virtual void update(float deltaTime) override;
+    virtual void draw(sf::RenderWindow& window) override;
+    virtual void cleanup() override;
 
 private:
-    Snake snake;
-    std::vector<Food> foods;
-    KeyboardManager keyboardManager;
     SceneManager& screenManager;
     float windowWidth;
     float windowHeight;
     float gridSize;
-    sf::Clock spawnClock;
     float spawnInterval;
+    Snake snake;
+    std::vector<Food> foods;
+    sf::Clock spawnClock;
+    SnakeAI ai; // Instance de l'IA
+    std::deque<sf::Vector2f> currentPath;
 
     void checkFoodCollision();
     void checkSelfCollision();

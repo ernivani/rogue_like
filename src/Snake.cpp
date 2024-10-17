@@ -5,7 +5,7 @@ Snake::Snake()
     : currentDirection(Direction::Right),
       nextDirection(Direction::Right),
       segmentSize(20.f),
-      moveSpeed(0.2f),
+      moveSpeed(0.f),
       moveTimer(0.f)
 {
     for (int i = 0; i < 3; ++i) {
@@ -101,4 +101,9 @@ void Snake::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 sf::Vector2f Snake::getHeadPosition() const {
     if (segments.empty()) return sf::Vector2f(0.f, 0.f);
     return segments.front().getPosition();
+}
+
+sf::Vector2f Snake::getTailPosition() const {
+    if (segments.empty()) return sf::Vector2f(0.f, 0.f);
+    return segments.back().getPosition();
 }

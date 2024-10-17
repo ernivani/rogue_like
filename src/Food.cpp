@@ -18,6 +18,7 @@ void Food::respawn() {
 
     float x = disX(gen) * gridSize;
     float y = disY(gen) * gridSize;
+    this->setPosition(x, y);
     shape.setPosition(x, y);
 }
 
