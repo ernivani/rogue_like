@@ -1,5 +1,6 @@
 // InputManager.cpp
 #include "InputManager.h"
+#include <iostream>
 
 InputManager::InputManager() {}
 

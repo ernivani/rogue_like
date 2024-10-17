@@ -1,5 +1,6 @@
 // MainScreen.cpp
 #include "MainScreen.h"
+#include <iostream>
 
 void MainScreen::init() {
     font.loadFromFile("res/fonts/cocogoose.ttf");
@@ -12,7 +13,8 @@ void MainScreen::init() {
 
 void MainScreen::handleInput(InputManager& inputManager) {
     if (inputManager.isKeyPressed(sf::Keyboard::Enter)) {
-        // Transition to HomeScreen or GameScreen
+        std::cout << "Enter key pressed!" << std::endl;
+        screenManager.changeScene("GameScreen"); // or "GameScreen"
     }
 }
 

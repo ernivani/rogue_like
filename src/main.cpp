@@ -1,8 +1,8 @@
-// main.cpp
 #include "Window.h"
 #include "Scene.h"
 #include "MainScreen.h"
 #include "GameScreen.h"
+#include "SceneManager.h"
 #include <iostream>
 #include "InputManager.h"
 
@@ -10,7 +10,18 @@ int main() {
     Window window("Minimalist Roguelite Game", {800, 600});
     InputManager inputManager;
 
-    Scene* currentScene = new GameScreen();
+    SceneManager& sceneManager = SceneManager::getInstance();
+    sceneManager.addScene(new MainScreen("MainScreen"));
+    sceneManager.addScene(new GameScreen("GameScreen"));
+    sceneManager.changeScene("MainScreen");
+
+    // Initial check for the current scene
+    Scene* currentScene = sceneManager.getCurrentScene();
+
+    if (currentScene == nullptr) {
+        std::cerr << "No scene loaded!" << std::endl;
+        return 1;
+    }
     currentScene->init();
 
     sf::Clock clock;
@@ -29,26 +40,24 @@ int main() {
             inputManager.handleEvent(event);
         }
 
-        currentScene->handleInput(inputManager);
-        currentScene->update(deltaTime);
+        currentScene = sceneManager.getCurrentScene();
 
-        window.beginDraw();
-        currentScene->draw(*window.getRenderWindow());
-        window.endDraw();
+        if (currentScene) {
+            currentScene->handleInput(inputManager);
+            currentScene->update(deltaTime);
 
-        inputManager.update(); // Reset per-frame input states
+            window.beginDraw();
+            currentScene->draw(*window.getRenderWindow());
+            window.endDraw();
+        }
 
-        // Scene transition logic
-        // if (someCondition) {
-        //     currentScene->cleanup();
-        //     delete currentScene;
-        //     currentScene = new GameScreen();
-        //     currentScene->init();
-        // }
+        inputManager.update();
     }
 
-    currentScene->cleanup();
-    delete currentScene;
+    if (currentScene) {
+        currentScene->cleanup();
+        delete currentScene;
+    }
 
     return 0;
 }

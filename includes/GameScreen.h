@@ -5,9 +5,12 @@
 #include "Scene.h"
 #include "Player.h"
 #include "KeyboardManager.h"
+#include "SceneManager.h"
 
 class GameScreen : public Scene {
 public:
+
+    GameScreen(const std::string& name) : Scene(name) {}
     void init() override;
     void handleInput(InputManager& inputManager) override;
     void update(float deltaTime) override;
@@ -17,7 +20,7 @@ public:
 private:
     Player player;
     KeyboardManager keyboardManager;
-    // Other game objects
+    SceneManager& screenManager = SceneManager::getInstance();
 };
 
 #endif // GAMESCREEN_H
