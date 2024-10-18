@@ -284,6 +284,9 @@ sf::Vector2f SnakeAI::getNextDirection(const Snake& snake, const std::vector<Foo
     // Trouver le chemin du serpent vers la nourriture
     std::deque<sf::Vector2f> path = findPath(startX, startY, endX, endY);
 
+    // Mettre à jour lastPath pour le dessin
+    lastPath = path;
+
     // Vérifier si le chemin est sûr
     if (!isPathSafe(path, snake)) {
         // Si le chemin n'est pas sûr, essayer de suivre la queue
@@ -294,6 +297,9 @@ sf::Vector2f SnakeAI::getNextDirection(const Snake& snake, const std::vector<Foo
         std::deque<sf::Vector2f> tailPath = findPath(startX, startY, tailX, tailY);
 
         if (!tailPath.empty()) {
+            // Mettre à jour lastPath pour le dessin
+            lastPath = tailPath;
+
             // Suivre la queue
             sf::Vector2f nextPosition = tailPath[1];
             sf::Vector2f direction = nextPosition - headPosition;
@@ -303,11 +309,12 @@ sf::Vector2f SnakeAI::getNextDirection(const Snake& snake, const std::vector<Foo
             if (direction.x < 0) return sf::Vector2f(-gridSize, 0.f);   // Gauche
             if (direction.y > 0) return sf::Vector2f(0.f, gridSize);    // Bas
             if (direction.y < 0) return sf::Vector2f(0.f, -gridSize);   // Haut
+        } else {
+            // Vider lastPath car aucun chemin n'a été trouvé
+            lastPath.clear();
         }
-    }
-
-    // Déterminer la direction à prendre si le chemin est sûr
-    if (path.size() >= 2) {
+    } else if (path.size() >= 2) {
+        // Le chemin vers la nourriture est sûr
         sf::Vector2f nextPosition = path[1];
         sf::Vector2f direction = nextPosition - headPosition;
 
@@ -316,36 +323,16 @@ sf::Vector2f SnakeAI::getNextDirection(const Snake& snake, const std::vector<Foo
         if (direction.x < 0) return sf::Vector2f(-gridSize, 0.f);   // Gauche
         if (direction.y > 0) return sf::Vector2f(0.f, gridSize);    // Bas
         if (direction.y < 0) return sf::Vector2f(0.f, -gridSize);   // Haut
+    } else {
+        // Vider lastPath car aucun chemin n'a été trouvé
+        lastPath.clear();
     }
 
     // Si aucun chemin sûr n'est trouvé, essayer de se déplacer en toute sécurité
-    std::vector<sf::Vector2f> possibleDirections = {
-        {gridSize, 0.f},    // Droite
-        {0.f, gridSize},    // Bas
-        {-gridSize, 0.f},   // Gauche
-        {0.f, -gridSize}    // Haut
-    };
+    // ...
 
-    for (const auto& dir : possibleDirections) {
-        sf::Vector2f newPos = headPosition + dir;
-
-        // Vérifier les limites
-        if (newPos.x < 0 || newPos.x >= windowWidth || newPos.y < 0 || newPos.y >= windowHeight)
-            continue;
-
-        // Vérifier les collisions avec le corps
-        bool collision = false;
-        for (const auto& segment : snake.getSegments()) {
-            if (segment == newPos) {
-                collision = true;
-                break;
-            }
-        }
-
-        if (!collision) {
-            return dir;
-        }
-    }
+    // Vider lastPath car aucun chemin n'a été trouvé
+    lastPath.clear();
 
     // Si aucune direction sûre n'est trouvée, ne pas bouger
     return sf::Vector2f(0.f, 0.f);
